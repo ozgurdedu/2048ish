@@ -25,7 +25,9 @@ public class GameManager : MonoBehaviour
     private Tween _sliderTween;
 
     public GameObject pausePanel;
+    public GameObject mainMenuPanel;
     public GameObject pauseButton;
+    
     public GameObject playButton; 
     
     
@@ -40,24 +42,33 @@ public class GameManager : MonoBehaviour
     {
        status = GameStatus.Pause;
     }
-
-    public void ClickPlayButton()
+    public void ClickStartButton()
     {
-        status = GameStatus.InGame; 
+        status = GameStatus.InGame;
         pausePanel.SetActive(false);
+        mainMenuPanel.SetActive(false);
         pauseButton.SetActive(true);
         isMove = true;
         _sliderTween.Play(); 
-
+    }
+    
+    public void ClickContinueButton()
+    {
+        status = GameStatus.InGame;
+        pausePanel.SetActive(false);
+        mainMenuPanel.SetActive(false);
+        pauseButton.SetActive(true);
+        isMove = true;
+        _sliderTween.Play(); 
     }
 
     private void Start()
     {
-        status = GameStatus.InGame;
+        status = GameStatus.MainMenu;
         
         isMove = true;
 
-        _sliderTween = slider.DOLocalMoveX(1.5f, 1f).SetLoops(-1, LoopType.Yoyo);
+        _sliderTween = slider.DOLocalMoveX(3.2f, 1f).SetLoops(-1, LoopType.Yoyo);
         
         ballCount = BallPooler.Instance.ballCount;
         remainingBallText.text = ballCount.ToString();
@@ -94,6 +105,14 @@ public class GameManager : MonoBehaviour
         {
             pausePanel.SetActive(true);
             pauseButton.SetActive(false); 
+            isMove = false;
+            _sliderTween.Pause();
+        }
+        if (status == GameStatus.MainMenu)
+        {
+            mainMenuPanel.SetActive(true);
+            pauseButton.SetActive(false); 
+            pausePanel.SetActive(false);
             isMove = false;
             _sliderTween.Pause();
         }
