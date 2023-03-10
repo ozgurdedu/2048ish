@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Enums;
 using TMPro;
 using UnityEngine;
 
@@ -20,18 +21,48 @@ public class GameManager : MonoBehaviour
 
     public TextMeshProUGUI remainingBallText;
     public int ballCount;
+
+    private Tween _sliderTween;
+
+    public GameObject pausePanel;
+    public GameObject pauseButton;
+    public GameObject playButton; 
+    
+    
+    public GameStatus status; 
+    
     private void Awake()
     {
         Instance = this;
     }
 
+    public void ClickPauseButton()
+    {
+       status = GameStatus.Pause;
+    }
+
+    public void ClickPlayButton()
+    {
+        status = GameStatus.InGame; 
+        pausePanel.SetActive(false);
+        pauseButton.SetActive(true);
+        isMove = true;
+        _sliderTween.Play(); 
+
+    }
 
     private void Start()
     {
+        status = GameStatus.InGame;
+        
+        isMove = true;
+
+        _sliderTween = slider.DOLocalMoveX(1.5f, 1f).SetLoops(-1, LoopType.Yoyo);
+        
         ballCount = BallPooler.Instance.ballCount;
         remainingBallText.text = ballCount.ToString();
 
-        isMove = true;
+        
         
         Balls = BallPooler.Instance.Balls;
 
@@ -51,87 +82,97 @@ public class GameManager : MonoBehaviour
         ball2.SetActive(true);
 
     }
-
-
+    
+    
+    
+    
     private void FixedUpdate()
     {
-        SliderMove();
         StartCoroutine(nameof(Shoot));
-
+        
+        if (status == GameStatus.Pause)
+        {
+            pausePanel.SetActive(true);
+            pauseButton.SetActive(false); 
+            isMove = false;
+            _sliderTween.Pause();
+        }
+        
     }
 
-
+    
     IEnumerator Shoot()
     {
-        if (Input.GetMouseButtonDown(0) && isMove)
+        
+
+        if (Input.touchCount > 0 && isMove && status == GameStatus.InGame)
         {
-            ballCount--;
-            remainingBallText.text = ballCount.ToString();
+            var touch = Input.GetTouch(0);
+            var touchPos = Camera.main.ScreenToViewportPoint(touch.position); //screen sized between 0-1
+            
+            
+            if (touch.phase == TouchPhase.Began && touchPos.y < 0.8f)
+            {
+                 isMove = false; 
+                 _sliderTween.Pause();
             
             if (ballCount == 0)
             {
                 Debug.Log("@@--DONE!");
+                slider.gameObject.SetActive(false);
             }
+                        
             
-            isMove = false;
+            
             
             Balls[activeBallIndex].transform.SetParent(null);
             Balls[activeBallIndex].GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
 
-            if (!isMove)
+            if (!isMove && Balls.Count > activeBallIndex + 1)
             {
                 Balls[activeBallIndex + 1].transform.DOMove(startPosition.position, 0.75f).OnComplete(() =>
-                {
-                    Balls[activeBallIndex].transform.SetParent(slider);
-                    isMove = true;
-                }); 
+                    {
+                        Balls[activeBallIndex].transform.SetParent(slider);
+                        isMove = true;
+                    });
             }
             
             
-            //Index was out of range.
-            if (activeBallIndex <= Balls.Count)
-                activeBallIndex++;
-            else
-            {
-                Debug.Log("abi" + activeBallIndex);
-                Debug.Log("bc" + ballCount);
-                Debug.Log("ballsC" + Balls.Count);
-            }
+
+            activeBallIndex++;
+            
+            ballCount--;
+            remainingBallText.text = ballCount.ToString();
             
             
-            if (!isMove)
+            if (!isMove && Balls.Count > activeBallIndex + 1)
             {
                 Balls[activeBallIndex].transform.DOMove(startPosition.position, 0.75f).OnComplete(() =>
                 {
+                    _sliderTween.Play();
                     Balls[activeBallIndex].transform.SetParent(slider);
                     isMove = true;
+                    
                 }); 
+                
+                Balls[activeBallIndex + 1].transform.position = nextBallTransform.position;
+                Balls[activeBallIndex + 1].transform.SetParent(null);
+            
+                Balls[activeBallIndex].SetActive(true);
+                Balls[activeBallIndex + 1].SetActive(true);
+                
+                
+                Balls[activeBallIndex + 1].transform.DOScale(Vector3.zero, 1f).From();
+            }
+            yield return new WaitForSeconds(0.25f);
+                
             }
             
-            Balls[activeBallIndex + 1].transform.position = nextBallTransform.position;
-            Balls[activeBallIndex + 1].transform.SetParent(null);
-            
-            Balls[activeBallIndex].SetActive(true);
-            
-            Balls[activeBallIndex + 1].SetActive(true);
-            Balls[activeBallIndex + 1].transform.DOScale(Vector3.zero, 1f).From();
-
-
-        
             
             
-            yield return new WaitForSeconds(1f);
         }
 
     }
     
     
-    private void SliderMove()
-    {
-        float h = Input.GetAxis("Mouse X");
-        slider.Translate(isMove ? (h * 0.25f) : 0, 0, 0);
-        
-        float x = Mathf.Clamp(slider.position.x, -1.5f, 1.5f);
-        slider.position = new Vector3(x, 0.85f);
-    }
 }
