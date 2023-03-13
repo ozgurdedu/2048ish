@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
             //     slider.gameObject.SetActive(false);
             // }
             
-            Balls[activeBallIndex].transform.SetParent(null);
+            Balls[activeBallIndex].transform.SetParent(BallPooler.Instance.transform);
             Balls[activeBallIndex].GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
 
             if (!isMove && Balls.Count > activeBallIndex + 1)
@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour
                 }); 
                 
                 Balls[activeBallIndex + 1].transform.position = nextBallTransform.position;
-                Balls[activeBallIndex + 1].transform.SetParent(null);
+                Balls[activeBallIndex + 1].transform.SetParent(BallPooler.Instance.transform);
             
                 Balls[activeBallIndex].SetActive(true);
                 Balls[activeBallIndex + 1].SetActive(true);
