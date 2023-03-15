@@ -159,9 +159,15 @@ public class GameManager : MonoBehaviour
         {
             var _transform = ball.transform;
             if (_transform.position.y > 1.3f)
+            {
                 ball.GetComponent<Ball>().canCollide = false;
+                ball.GetComponent<CircleCollider2D>().isTrigger = true; 
+            }
             else
+            {
                 ball.GetComponent<Ball>().canCollide = true;
+                ball.GetComponent<CircleCollider2D>().isTrigger = false; 
+            }
         }
         
     }
