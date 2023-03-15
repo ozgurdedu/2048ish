@@ -10,7 +10,7 @@ public class Ball : MonoBehaviour
     public int ballNumber;
     [SerializeField] private ParticleSystem effect;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    
+    public bool canCollide;
 
     void Start()
     {
@@ -26,7 +26,7 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag(ballNumber.ToString()) && ballNumber <= 1024)
+        if (collision.gameObject.CompareTag(ballNumber.ToString()) && ballNumber <= 1024 && canCollide)
         {
             
             if (!effect.isPlaying)
@@ -39,11 +39,27 @@ public class Ball : MonoBehaviour
             
 
         }
-        if (collision.gameObject.CompareTag(ballNumber.ToString()) && ballNumber > 1024)
+        if (collision.gameObject.CompareTag(ballNumber.ToString()) && ballNumber > 1024 && canCollide)
         {
+            Debug.Log("2048ler degdi");
             //collision.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(300f,300f));    
             //bomb effect
             //2048 - 2048 çarpışırsa bombaya dönüşsün ve değdiğinde ortalığı patlatsın.
+            
+            var bp = BallPooler.Instance.gameObject;
+            foreach (var b in bp.GetComponentsInChildren<Transform>())
+            { 
+                if(b.gameObject.activeInHierarchy)
+                {
+                    if (b.gameObject.name == "Ball(Clone)" && b.transform.position.y < 1f)
+                    {
+                        b.gameObject.SetActive(false);
+                    }
+                }
+            }
+
+            
+            
         }
         
     }

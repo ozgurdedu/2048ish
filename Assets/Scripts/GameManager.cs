@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour
     public Transform slider;
     public Transform startPosition;
 
-    private bool isMove; 
+    private bool isMove;
     public static GameManager Instance;
 
     public TextMeshProUGUI remainingBallText;
@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
         status = GameStatus.MainMenu;
         onMainMenu?.Invoke();
         isMove = true;
-
+        
         _sliderTween = slider.DOLocalMoveX(3.2f, 1f).SetLoops(-1, LoopType.Yoyo);
         _sliderTween.Pause();
         
@@ -77,9 +77,8 @@ public class GameManager : MonoBehaviour
     private void FixedUpdate()
     {
         StartCoroutine(nameof(Shoot));
+        
     }
-    
-    
     
     IEnumerator Shoot()
     {
@@ -89,10 +88,12 @@ public class GameManager : MonoBehaviour
             var touchPos = Camera.main.ScreenToViewportPoint(touch.position); //screen sized between 0-1
             if (touch.phase == TouchPhase.Began && touchPos.y < 0.8f)
             {
-                _sliderTween.Pause();
-                isMove = false; 
                 
-            // if (ballCount == 0)
+                CanTheBallCollide();
+                _sliderTween.Pause();
+                isMove = false;
+                
+                // if (ballCount == 0)
             // {
             //     Debug.Log("@@--DONE!");
             //     slider.gameObject.SetActive(false);
@@ -140,13 +141,29 @@ public class GameManager : MonoBehaviour
                 
                 
             }
-            
-            yield return new WaitForSeconds(0.25f);
+
             }
-            
+
+            yield return new WaitForSeconds(0.25f);
+
+           
             
         }
 
+    }
+
+
+    public void CanTheBallCollide()
+    {
+        foreach (var ball in Balls)
+        {
+            var _transform = ball.transform;
+            if (_transform.position.y > 1.3f)
+                ball.GetComponent<Ball>().canCollide = false;
+            else
+                ball.GetComponent<Ball>().canCollide = true;
+        }
+        
     }
     
     private void OnEnable()

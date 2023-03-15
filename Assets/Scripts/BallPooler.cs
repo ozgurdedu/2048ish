@@ -14,12 +14,10 @@ public class BallPooler : MonoBehaviour
     [HideInInspector] public GameObject Ball;
     public int ballCount;
     public List<GameObject> Balls = new List<GameObject>();
-    public int activeBallIndex = 0;
+    [HideInInspector] public int activeBallIndex = 0;
     public Transform startPosition;
     public Transform sliderPosition;
-
-    public bool isMove; 
-    public GameObject ball1, ball2;
+    [HideInInspector]public GameObject ball1, ball2;
    
     
     
