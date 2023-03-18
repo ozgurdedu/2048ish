@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     
     public Transform slider;
     public Transform startPosition;
-
+    public GameObject background; 
     private bool isMove;
     public static GameManager Instance;
 
@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     private Tween _sliderTween;
     
     public GameStatus status;
+    public GameColors color; 
     
     
     //***
@@ -175,11 +176,14 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         UiManager.onStatus += OnStatus;
+        UiManager.onColorChanged += OnColorChanged; 
     }
+
     
     private void OnDisable()
     {
         UiManager.onStatus -= OnStatus;
+        UiManager.onColorChanged -= OnColorChanged;
     }
     
     private void OnStatus(GameStatus _status)
@@ -202,6 +206,33 @@ public class GameManager : MonoBehaviour
         }
 
     }
+    
+    private void OnColorChanged(GameColors _color)
+    {
+        color = _color;
+        switch (color)
+        {
+                
+            case GameColors.Red:
+                   
+                slider.gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 0.47f, 0.36f);
+                background.GetComponent<SpriteRenderer>().color = Color.red;
+                break;
+            case GameColors.Yellow:
+                slider.gameObject.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 0.51f);
+                background.GetComponent<SpriteRenderer>().color = Color.yellow;
+                break; 
+            case GameColors.Blue:
+                slider.gameObject.GetComponent<SpriteRenderer>().color = new Color(0.45f, 0.43f, 1f);
+                background.GetComponent<SpriteRenderer>().color = Color.blue;
+                break;
+            case GameColors.White:
+                slider.gameObject.GetComponent<SpriteRenderer>().color = new Color(0.99f, 1f, 0.91f);
+                background.GetComponent<SpriteRenderer>().color = Color.white;
+                break;
+        }
+    }
+
     
 }
 

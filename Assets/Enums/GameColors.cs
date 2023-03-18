@@ -1,9 +1,10 @@
 ﻿namespace Enums
 {
-   public enum GameStatus
+   public enum GameColors
    {
-      MainMenu, 
-      InGame, 
-      Pause, 
+      Red, 
+      Yellow, 
+      Blue, 
+      White
    }
 }

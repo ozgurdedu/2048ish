@@ -9,6 +9,7 @@ public class Ball : MonoBehaviour
     [SerializeField] private TextMeshProUGUI ballNumberText;
     public int ballNumber;
     [SerializeField] private ParticleSystem effect;
+    [SerializeField] private ParticleSystem effect2048;
     [SerializeField] private SpriteRenderer spriteRenderer;
     public bool canCollide;
 
@@ -23,6 +24,9 @@ public class Ball : MonoBehaviour
                 spriteRenderer.sprite = dict.Value;
         }
     }
+
+    
+
 
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -45,6 +49,12 @@ public class Ball : MonoBehaviour
             //collision.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(300f,300f));    
             //bomb effect
             //2048 - 2048 çarpışırsa bombaya dönüşsün ve değdiğinde ortalığı patlatsın.
+
+            effect2048.transform.position = transform.position; 
+            effect2048.gameObject.SetActive(true);
+            if (!effect2048.isPlaying)
+                effect2048.Play();
+            
             
             var bp = BallPooler.Instance.gameObject;
             foreach (var b in bp.GetComponentsInChildren<Transform>())
@@ -54,6 +64,7 @@ public class Ball : MonoBehaviour
                     if (b.gameObject.name == "Ball(Clone)" && b.transform.position.y < 1f)
                     {
                         b.gameObject.SetActive(false);
+                       
                     }
                 }
             }
